@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:gravity="center"
+    android:background="@drawable/bg_employee_card"
+    android:margin="6dp"
+    android:padding="16dp"
+    android:clickable="true"
+    android:focusable="true">
+
+    <!-- Avatar initiales -->
+    <TextView
+        android:id="@+id/tvInitials"
+        android:layout_width="56dp"
+        android:layout_height="56dp"
+        android:gravity="center"
+        android:textSize="20sp"
+        android:textStyle="bold"
+        android:textColor="@color/white"
+        android:background="@drawable/bg_avatar" />
+
+    <TextView
+        android:id="@+id/tvEmployeeName"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Ahmed B."
+        android:textSize="14sp"
+        android:textStyle="bold"
+        android:textColor="@color/text_primary"
+        android:gravity="center"
+        android:maxLines="2"
+        android:layout_marginTop="8dp" />
+
+    <TextView
+        android:id="@+id/tvPoste"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Technicien"
+        android:textSize="11sp"
+        android:textColor="@color/text_secondary"
+        android:gravity="center" />
+
+</LinearLayout>
