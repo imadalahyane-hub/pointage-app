@@ -22,6 +22,14 @@ jobs:
       - name: Create local.properties
         run: echo "sdk.dir=$ANDROID_HOME" > local.properties
 
+      - name: Force gradle.properties
+        run: |
+          echo "android.useAndroidX=true" > gradle.properties
+          echo "android.enableJetifier=true" >> gradle.properties
+          echo "org.gradle.jvmargs=-Xmx2048m -Dfile.encoding=UTF-8" >> gradle.properties
+          echo "kotlin.code.style=official" >> gradle.properties
+          cat gradle.properties
+
       - name: Generate Gradle Wrapper
         run: gradle wrapper --gradle-version 8.2
 
