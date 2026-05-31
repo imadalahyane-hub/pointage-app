@@ -1,52 +1,28 @@
-name: Build APK
-on: [push]
-jobs:
-  build:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v3
-
-      - uses: actions/setup-java@v3
-        with:
-          java-version: '17'
-          distribution: 'temurin'
-
-      - name: Setup Android SDK
-        uses: android-actions/setup-android@v3
-
-      - name: Install Gradle
-        uses: gradle/gradle-build-action@v2
-        with:
-          gradle-version: '8.2'
-
-      - name: Create local.properties
-        run: echo "sdk.dir=$ANDROID_HOME" > local.properties
-
-      - name: Force gradle.properties
+- name: Create launcher icons
         run: |
-          echo "android.useAndroidX=true" > gradle.properties
-          echo "android.enableJetifier=true" >> gradle.properties
-          echo "org.gradle.jvmargs=-Xmx2048m -Dfile.encoding=UTF-8" >> gradle.properties
-          echo "kotlin.code.style=official" >> gradle.properties
+          python3 - <<'EOF'
+          import os, struct, zlib
 
-      - name: Create launcher icons
-        run: |
-          for folder in mipmap-mdpi mipmap-hdpi mipmap-xhdpi mipmap-xxhdpi mipmap-xxxhdpi; do
-            mkdir -p app/src/main/res/$folder
-            convert -size 192x192 xc:"#1565C0" app/src/main/res/$folder/ic_launcher.png
-            convert -size 192x192 xc:"#1565C0" app/src/main/res/$folder/ic_launcher_round.png
-          done
+          def make_png(size, color=(21, 101, 192)):
+              def chunk(name, data):
+                  c = struct.pack('>I', len(data)) + name + data
+                  return c + struct.pack('>I', zlib.crc32(c[4:]) & 0xffffffff)
+              raw = b''
+              for _ in range(size):
+                  row = b'\x00'
+                  for _ in range(size):
+                      row += bytes(color) + b'\xff'
+                  raw += row
+              compressed = zlib.compress(raw)
+              ihdr = struct.pack('>IIBBBBB', size, size, 8, 2, 0, 0, 0)
+              return b'\x89PNG\r\n\x1a\n' + chunk(b'IHDR', ihdr) + chunk(b'IDAT', compressed) + chunk(b'IEND', b'')
 
-      - name: Generate Gradle Wrapper
-        run: gradle wrapper --gradle-version 8.2
-
-      - name: Make gradlew executable
-        run: chmod +x gradlew
-
-      - name: Build APK
-        run: ./gradlew assembleDebug
-
-      - uses: actions/upload-artifact@v4
-        with:
-          name: pointage-app-debug
-          path: app/build/outputs/apk/debug/app-debug.apk
+          folders = ['mipmap-mdpi','mipmap-hdpi','mipmap-xhdpi','mipmap-xxhdpi','mipmap-xxxhdpi']
+          for folder in folders:
+              path = f'app/src/main/res/{folder}'
+              os.makedirs(path, exist_ok=True)
+              png = make_png(192)
+              open(f'{path}/ic_launcher.png', 'wb').write(png)
+              open(f'{path}/ic_launcher_round.png', 'wb').write(png)
+          print('Icons created!')
+          EOF
