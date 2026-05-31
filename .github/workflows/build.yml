@@ -28,7 +28,14 @@ jobs:
           echo "android.enableJetifier=true" >> gradle.properties
           echo "org.gradle.jvmargs=-Xmx2048m -Dfile.encoding=UTF-8" >> gradle.properties
           echo "kotlin.code.style=official" >> gradle.properties
-          cat gradle.properties
+
+      - name: Create launcher icons
+        run: |
+          for folder in mipmap-mdpi mipmap-hdpi mipmap-xhdpi mipmap-xxhdpi mipmap-xxxhdpi; do
+            mkdir -p app/src/main/res/$folder
+            convert -size 192x192 xc:"#1565C0" app/src/main/res/$folder/ic_launcher.png
+            convert -size 192x192 xc:"#1565C0" app/src/main/res/$folder/ic_launcher_round.png
+          done
 
       - name: Generate Gradle Wrapper
         run: gradle wrapper --gradle-version 8.2
